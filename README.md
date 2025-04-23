@@ -1,5 +1,6 @@
 # 📘 Project Versioning Plugin for Unreal Engine 5+
 
+[Preview](logo.png)
 
 ## 🧩 What is it?
 
