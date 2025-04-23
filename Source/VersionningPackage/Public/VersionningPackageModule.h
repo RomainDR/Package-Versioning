@@ -19,12 +19,36 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
+	/**
+	 * Open custom window of packaging 
+	 */
 	void OpenWindowPackageSettings();
+	/**
+	 * Add the custom toolbar
+	 */
 	void AddToolbarCommands();
+	/**
+	 * Reset the version of asset
+	 */
 	void ResetVersion();
+	/**
+	 * Update major version
+	 */
 	void UpdateMajorVersion();
+	/**
+	 * Event when window closed. Delete the variable
+	 * @param ClosedWindow Window Reference
+	 */
 	void OnWindowClosed(const TSharedRef<SWindow>& ClosedWindow);
+	/**
+	 * Get the Data Asset, or create if not exist
+	 * @return Pointer of dataAsset
+	 */
 	UVersionDataAsset* EnsureVersionDataAssetExists();
 
+	/**
+	 * Generate sub menu of category
+	 * @return A reference of submenu
+	 */
 	TSharedRef<SWidget> GeneratePackageProject();
 };

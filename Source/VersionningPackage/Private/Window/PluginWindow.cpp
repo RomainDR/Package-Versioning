@@ -228,7 +228,6 @@ void SPluginWindow::UpdateCmdLine()
 	FString DevTypeStr = SelectedDevType.IsValid() ? SelectedDevType->ToString() : TEXT("Development");
 	FString PathExport = pathWidget.Get()->GetText().IsEmpty() ? ProjectPath.Mid(0, indexLastChar).Append("/DefaultBuild") : pathWidget.Get()->GetText().ToString();
 
-	// Options additionnelles selon la config
 	FString AdditionalOptions;
 
 	if (DevTypeStr == TEXT("Shipping"))
@@ -244,7 +243,7 @@ void SPluginWindow::UpdateCmdLine()
 		*DevTypeStr,
 		*PlatformStr,
 		*AdditionalOptions,
-		*PathExport // <-- QString contenant le chemin comme "D:/ExportMyGame"
+		*PathExport
 	);
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *fullCmd);
@@ -316,9 +315,7 @@ FReply SPluginWindow::OnDoPackageClicked()
 		VersionDataAsset->IncreasePatch();
 	}
 	UVersionDataAsset* _asset = VersionDataAsset;
-
-
-	// Chemin vers Unreal Automation Tool (UAT)
+	
 	const FString UATPath = FPaths::Combine(FPaths::EngineDir(), TEXT("Build"), TEXT("BatchFiles"), TEXT("RunUAT.bat"));
 
 	const FString cmd = cmdInput->GetText().ToString();
