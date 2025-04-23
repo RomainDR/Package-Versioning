@@ -1,0 +1,12 @@
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+.vs/
+*.sln
+*.opensdf
+*.sdf
+*.xcodeproj
+.idea/
+.DS_Store
+Thumbs.db

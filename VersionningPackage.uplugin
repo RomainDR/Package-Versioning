@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "VersionningPackage",
+	"Description": "A plugin to package with automatic change version",
+	"Category": "Custom",
+	"CreatedBy": "Romain Drouhot",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "VersionningPackage",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
