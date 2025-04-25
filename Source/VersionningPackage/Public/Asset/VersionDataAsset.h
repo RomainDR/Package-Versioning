@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Runtime/Core/Tests/Misc/PathTests.h"
 #include "UObject/SavePackage.h"
 #include "VersionDataAsset.generated.h"
 
@@ -16,13 +15,13 @@ class VERSIONNINGPACKAGE_API UVersionDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Version", meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plugins|PackageVersioning", meta = (AllowPrivateAccess))
 	int Major = 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Version", meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plugins|PackageVersioning", meta = (AllowPrivateAccess))
 	int Minor = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Version", meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Plugins|PackageVersioning", meta = (AllowPrivateAccess))
 	int Patch = 0;
 	UPROPERTY(VisibleAnywhere, Category = "Version")
 	FString Path = "";
@@ -32,7 +31,7 @@ public:
 	FORCEINLINE int GetMinor() const { return Minor; }
 	FORCEINLINE int GetPatch() const { return Patch; }
 
-	FORCEINLINE FString GetPath()const
+	FORCEINLINE FString GetPath() const
 	{
 		return Path;
 	}
@@ -70,6 +69,7 @@ public:
 		Patch = patch;
 		Save();
 	}
+
 	void UpdatePath(const FString& path)
 	{
 		Path = path;

@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "Asset/VersionDataAsset.h"
 #include "Modules/ModuleManager.h"
-#include "Factories/Factory.h"
 
 class FVersionningPackageModule : public IModuleInterface
 {
+#if WITH_EDITOR
 	UToolMenus* ToolMenus = nullptr;
 	UVersionDataAsset* DataAsset = nullptr;
 	static TSharedPtr<FSlateStyleSet> StyleSet;
@@ -58,4 +58,6 @@ private:
 	 * @return A reference of submenu
 	 */
 	TSharedRef<SWidget> GeneratePackageProject();
+#endif
+	
 };

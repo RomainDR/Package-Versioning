@@ -41,17 +41,25 @@ public class VersionningPackage : ModuleRules
 				"Slate",
 				"SlateCore",
 				"InputCore",
-				"EditorFramework",
-				"EditorStyle",
-				"UnrealEd",
-				"LevelEditor",
-				"InteractiveToolsFramework",
-				"EditorInteractiveToolsFramework",
-				"ToolMenus",
-				"Json", "EditorStyle"
-				// ... add private dependencies that you statically link with here ...	
+				"Json"
+				// ... autres runtime-only modules ici ...
 			}
 		);
+
+		if (Target.bBuildEditor)
+			PrivateDependencyModuleNames.AddRange(
+				new[]
+				{
+					"EditorFramework",
+					"UnrealEd",
+					"LevelEditor",
+					"InteractiveToolsFramework",
+					"EditorInteractiveToolsFramework",
+					"ToolMenus",
+					"EditorStyle"
+					// ... autres modules Editor-only ici ...
+				}
+			);
 
 
 		DynamicallyLoadedModuleNames.AddRange(

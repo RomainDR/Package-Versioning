@@ -93,7 +93,8 @@ TSharedRef<SOverlay> SPluginWindow::LoadUI()
 		+ SOverlay::Slot().Padding(10, 5)
 		[
 			SNew(SVerticalBox)
-			+ SVerticalBox::Slot().Padding(30, 5)
+			+ SVerticalBox::Slot()
+			.Padding(30, 5)
 			.FillHeight(1)
 			[
 				SNew(SScaleBox)
@@ -106,15 +107,17 @@ TSharedRef<SOverlay> SPluginWindow::LoadUI()
 				]
 				.Stretch(EStretch::ScaleToFit)
 			]
-			+ SVerticalBox::Slot().Padding(20, 5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(1)
 			[
 				BuildHorizontalBox()
 			]
-			+ SVerticalBox::Slot().Padding(20, 5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(0.75)
 			.HAlign(HAlign_Center)
-	.VAlign(VAlign_Center)
+			.VAlign(VAlign_Center)
 			[
 
 				SNew(STextBlock)
@@ -122,15 +125,17 @@ TSharedRef<SOverlay> SPluginWindow::LoadUI()
 				.Font(FCoreStyle::GetDefaultFontStyle("Italic", 16))
 				.Justification(ETextJustify::Center)
 			]
-			+ SVerticalBox::Slot().Padding(20, 5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(0.75)
 			[
 				BoxedCmdInput.ToSharedRef()
 			]
-			+ SVerticalBox::Slot().Padding(20, 5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(.5)
 			.HAlign(HAlign_Center)
-	.VAlign(VAlign_Center)  
+			.VAlign(VAlign_Center)
 			[
 
 				SNew(STextBlock)
@@ -138,7 +143,8 @@ TSharedRef<SOverlay> SPluginWindow::LoadUI()
 				.Font(FCoreStyle::GetDefaultFontStyle("Italic", 16))
 				.Justification(ETextJustify::Center)
 			]
-			+ SVerticalBox::Slot().Padding(20,5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(.5)
 			[
 				SNew(SHorizontalBox)
@@ -168,7 +174,8 @@ TSharedRef<SOverlay> SPluginWindow::LoadUI()
 					.OnClicked(this, &SPluginWindow::OpenSelectorFolder)
 				]
 			]
-			+ SVerticalBox::Slot().Padding(20,5)
+			+ SVerticalBox::Slot()
+			.Padding(20, 5)
 			.FillHeight(.5)
 			[
 				SNew(SButton)
@@ -218,33 +225,39 @@ void SPluginWindow::Construct(const FArguments& InArgs)
 		LoadUI()
 	];
 }
-
 void SPluginWindow::UpdateCmdLine()
 {
 	FString ProjectPath = FPaths::ConvertRelativePathToFull(FPaths::GetProjectFilePath());
 
 	int indexLastChar = -1;
 	ProjectPath.FindLastChar('/', indexLastChar);
-	FString PlatformStr = SelectedPlatform.IsValid() ? SelectedPlatform->ToString() : TEXT("Windows");
+
+	FString PlatformStr = SelectedPlatform.IsValid() ? SelectedPlatform->ToString() : TEXT("Win64");
+	// Unreal attend Win64, Android, etc., pas "Windows" (corrige si tu avais "Windows")
+	if (PlatformStr == TEXT("Windows")) { PlatformStr = TEXT("Win64"); }
+
 	FString DevTypeStr = SelectedDevType.IsValid() ? SelectedDevType->ToString() : TEXT("Development");
-	FString PathExport = pathWidget.Get()->GetText().IsEmpty() ? ProjectPath.Mid(0, indexLastChar).Append("/DefaultBuild") : pathWidget.Get()->GetText().ToString();
+	FString PathExport = pathWidget.Get()->GetText().IsEmpty()
+		? ProjectPath.Mid(0, indexLastChar).Append("/DefaultBuild")
+		: pathWidget.Get()->GetText().ToString();
 
+	// Options selon Shipping/Development
 	FString AdditionalOptions;
-
 	if (DevTypeStr == TEXT("Shipping"))
 	{
-		AdditionalOptions += TEXT(" -nodebuginfo");
+		AdditionalOptions += TEXT(" -nodebuginfo -compressed");
 	}
 
+	// Options générales recommandées pour UE5 (archives, pak, iostore, etc.)
+	// iostore recommandé pour UE5, peut être retiré sinon
 	FString fullCmd = FString::Printf(
-		TEXT(
-			"BuildCookRun -project=\"%s\" -noP4 -clientconfig=%s -serverconfig=%s -platform=%s -cook -allmaps -build -stage -package %s -archive -archivedirectory=\"%s\""),
+		TEXT("BuildCookRun -project=\"%s\" -noP4 -platform=%s -clientconfig=%s -serverconfig=%s -cook -allmaps -build -stage -pak -iostore -archive -archivedirectory=\"%s\"%s"),
 		*ProjectPath,
-		*DevTypeStr,
-		*DevTypeStr,
 		*PlatformStr,
-		*AdditionalOptions,
-		*PathExport
+		*DevTypeStr,
+		*DevTypeStr,
+		*PathExport,
+		*AdditionalOptions
 	);
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *fullCmd);
@@ -295,7 +308,7 @@ FReply SPluginWindow::OnDoPackageClicked()
 {
 	if (isRunning)
 	{
-		OPEN_ERROR_POPUP("A package is already started.");		
+		OPEN_ERROR_POPUP("A package is already started.");
 		return FReply::Handled();
 	}
 	isRunning = true;
@@ -314,12 +327,11 @@ FReply SPluginWindow::OnDoPackageClicked()
 	{
 		VersionDataAsset->IncreasePatch();
 	}
-	UVersionDataAsset* _asset = VersionDataAsset;
-	
-	const FString UATPath = FPaths::Combine(FPaths::EngineDir(), TEXT("Build"), TEXT("BatchFiles"), TEXT("RunUAT.bat"));
 
+	const FString UATPath = FPaths::Combine(FPaths::EngineDir(), TEXT("Build"), TEXT("BatchFiles"), TEXT("RunUAT.bat"));
 	const FString cmd = cmdInput->GetText().ToString();
-	Async(EAsyncExecution::Thread, [UATPath, cmd, _asset, major, minor, patch, this]
+
+	Async(EAsyncExecution::Thread, [UATPath, cmd, major, minor, patch, this]
 	{
 		int32 ReturnCode = 0;
 		FString Output;
@@ -327,23 +339,32 @@ FReply SPluginWindow::OnDoPackageClicked()
 
 		FPlatformProcess::ExecProcess(*UATPath, *cmd, &ReturnCode, &Output, &ErrorOutput);
 
-		if (ReturnCode == 0)
-		{
-			isRunning = false;
-			OPEN_INFO_POPUP("Packaging complete.");
-		}
-		else
-		{
-			isRunning = false;
-			_asset->SetVersion(major, minor, patch);
-			FString msg = "Packaging failed";
-			if (!ErrorOutput.IsEmpty())
-			{
-				msg.Append(": " + ErrorOutput);
-			}
 
-			OPEN_ERROR_POPUP(msg);
-		}
+		// Revenir sur le Game Thread pour toute opération UObject/Slate/UI
+		AsyncTask(ENamedThreads::GameThread, [this, ReturnCode, major, minor, patch, ErrorOutput, Output]
+		{
+			isRunning = false;
+			if (ReturnCode == 0)
+			{
+				OPEN_INFO_POPUP("Packaging complete.");
+			}
+			else
+			{
+				// Echec : restore la version précédente et affiche la popup d’erreur
+				VersionDataAsset->SetVersion(major, minor, patch);
+				FString msg = "Packaging failed";
+				if (!ErrorOutput.IsEmpty())
+				{
+					msg.Append(": " + ErrorOutput);
+				}
+				else if (!Output.IsEmpty())
+				{
+					msg.Append(": " + Output);
+				}
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *Output);
+				OPEN_ERROR_POPUP(msg);
+			}
+		});
 	});
 	return FReply::Handled();
 }
