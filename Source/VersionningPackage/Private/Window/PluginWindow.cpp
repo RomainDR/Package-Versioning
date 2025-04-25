@@ -1,6 +1,7 @@
 ﻿#include "../Public/Window/PluginWindow.h"
 
 #include "DesktopPlatformModule.h"
+#include "VersionningPackage/Utils/Util.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Layout/SScaleBox.h"
 
@@ -294,8 +295,7 @@ FReply SPluginWindow::OnDoPackageClicked()
 {
 	if (isRunning)
 	{
-		FMessageDialog::Open(EAppMsgCategory::Error, EAppMsgType::Ok,
-		                     FText::FromString("A package is already started."));
+		OPEN_ERROR_POPUP("A package is already started.");		
 		return FReply::Handled();
 	}
 	isRunning = true;
@@ -330,8 +330,7 @@ FReply SPluginWindow::OnDoPackageClicked()
 		if (ReturnCode == 0)
 		{
 			isRunning = false;
-			FMessageDialog::Open(EAppMsgCategory::Info, EAppMsgType::Ok,
-			                     FText::FromString("Packaging complete"));
+			OPEN_INFO_POPUP("Packaging complete.");
 		}
 		else
 		{
@@ -343,8 +342,7 @@ FReply SPluginWindow::OnDoPackageClicked()
 				msg.Append(": " + ErrorOutput);
 			}
 
-			FMessageDialog::Open(EAppMsgCategory::Error, EAppMsgType::Ok,
-			                     FText::FromString(msg));
+			OPEN_ERROR_POPUP(msg);
 		}
 	});
 	return FReply::Handled();

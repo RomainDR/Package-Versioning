@@ -13,6 +13,7 @@ class FVersionningPackageModule : public IModuleInterface
 	UVersionDataAsset* DataAsset = nullptr;
 	static TSharedPtr<FSlateStyleSet> StyleSet;
 	TWeakPtr<SWindow> WindowPackageSettings;
+	TWeakPtr<SWindow> WindowVersionSettings;
 
 public:
 	virtual void StartupModule() override;
@@ -23,6 +24,12 @@ private:
 	 * Open custom window of packaging 
 	 */
 	void OpenWindowPackageSettings();
+
+	void OnWindowVersionClosed(const TSharedRef<SWindow>& Window);
+	/**
+	 * Open custom window for set version manually
+	 */
+	void OpenWindowSetVersionSettings();
 	/**
 	 * Add the custom toolbar
 	 */

@@ -1,8 +1,8 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "VersionningPackage",
+	"VersionName": "1.1",
+	"FriendlyName": "Versioning Package",
 	"Description": "A plugin to package with automatic change version",
 	"Category": "Custom",
 	"CreatedBy": "Romain Drouhot",
@@ -10,9 +10,9 @@
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
-	"CanContainContent": true,
+	"CanContainContent": false,
 	"IsBetaVersion": true,
-	"IsExperimentalVersion": true,
+	"IsExperimentalVersion": false,
 	"Installed": false,
 	"Modules": [
 		{

@@ -10,6 +10,7 @@
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Window/PluginWindow.h"
+#include "Window/WindowVersion.h"
 
 static const FName TabName("MyCustomEditorTab");
 
@@ -68,6 +69,46 @@ void FVersionningPackageModule::OpenWindowPackageSettings()
     FSlateApplication::Get().AddWindow(PackageWindow);
 }
 
+void FVersionningPackageModule::OnWindowVersionClosed(const TSharedRef<SWindow>& Window)
+{
+    if (WindowVersionSettings.IsValid() && WindowVersionSettings.Pin() == Window)
+    {
+        WindowVersionSettings = nullptr;
+    }
+}
+void FVersionningPackageModule::OpenWindowSetVersionSettings()
+{
+    if (WindowVersionSettings.IsValid())
+    {
+        WindowVersionSettings.Pin()->BringToFront();
+        return;
+    }
+
+    DataAsset = EnsureVersionDataAssetExists();
+
+    TSharedRef<SWindow> Window = SNew(SWindow)
+        .Title(LOCTEXT("PackageProjectWindowTitle", "Set Version"))
+        .ClientSize(FVector2D(700.0f, 250.0f))
+        .SupportsMinimize(false)
+        .SupportsMaximize(false)
+        .SizingRule(ESizingRule::FixedSize)
+        [
+            SNew(SWindowVersion)
+            .VersionDataAsset(DataAsset)
+        ];
+    
+    Window->SetOnWindowClosed(FOnWindowClosed::CreateRaw(this, &FVersionningPackageModule::OnWindowVersionClosed));
+
+    // FIXED: Assign to WindowVersionSettings!
+    WindowVersionSettings = Window;
+    
+    FSlateApplication::Get().AddWindow(Window);
+
+    // This is safe now, but Window->BringToFront() is also OK.
+    WindowVersionSettings.Pin()->BringToFront();
+}
+
+
 //-----------------------------------------------------------------------------
 // Callback: Cleans up the pointer when the settings window is closed
 void FVersionningPackageModule::OnWindowClosed(const TSharedRef<SWindow>& ClosedWindow)
@@ -115,6 +156,15 @@ TSharedRef<SWidget> FVersionningPackageModule::GeneratePackageProject()
             INVTEXT("Update the major version of project"),
             FSlateIcon(FName("EditorStyle"), "Symbols.Check"),
             FUIAction(FExecuteAction::CreateRaw(this, &FVersionningPackageModule::UpdateMajorVersion))
+        );
+        
+        // Button: Increase major version
+        packageProject.AddMenuEntry(
+            "SetVersion",
+            INVTEXT("Set Version"),
+            INVTEXT("Set a version manually"),
+            FSlateIcon(FName("EditorStyle"), "LevelEditor.GameSettings"),
+            FUIAction(FExecuteAction::CreateRaw(this, &FVersionningPackageModule::OpenWindowSetVersionSettings))
         );
     }
 

@@ -12,7 +12,7 @@
  * This widget allows users to select target platform, build configuration,
  * customize command line, and trigger the packaging process.
  */
-class SPluginWindow : public SCompoundWidget
+class SPluginWindow final : public SCompoundWidget
 {
 public:
     SLATE_BEGIN_ARGS(SPluginWindow)
